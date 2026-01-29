@@ -93,9 +93,23 @@ export class Projects {
       this.isAdding.set(true);
       
       const newProject: addProjectect = this.addProjectForm.value as addProjectect;
+      console.log('Adding project:', newProject);
+      console.log('Current teamId from route:', this.teamId);
+      console.log('Is team page:', this.isTeamPage());
+      
       this.projectService.addProject(newProject).subscribe({
         next: (data) => {
-          this.projects.set([...this.projects(), data]);
+          console.log('Project added successfully:', data);
+          console.log('Project team_id:', data.team_id, 'Current filter teamId:', this.teamId);
+          
+          // רק אם הפרויקט שייך לצוות הנוכחי (או אין פילטר), הוסף אותו לרשימה
+          if (this.teamId === null || data.team_id === this.teamId) {
+            this.projects.set([...this.projects(), data]);
+            console.log('Project added to display list');
+          } else {
+            console.log('Project added to different team, not showing in current view');
+          }
+          
           this.addProjectForm.enable();
           
           // Reset form with defaults

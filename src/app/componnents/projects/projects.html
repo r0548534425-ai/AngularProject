@@ -22,6 +22,11 @@
         <option value="high">עדיפות גבוהה</option>
       </select>
       
+      <!-- Debug info -->
+      <div style="background: #ffeb3b; padding: 5px; margin: 5px 0;">
+        DEBUG: teamId = {{ teamId }}, isTeamPage = {{ isTeamPage() }}, formTeamId = {{ addProjectForm.get('teamId')?.value }}
+      </div>
+      
       @if (isTeamPage()) {
         <div class="info-message">
           הפרויקט יתווסף לצוות: {{ getTeamName(teamId!) }}
