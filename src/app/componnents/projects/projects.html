@@ -1,0 +1,74 @@
+
+
+
+
+
+@if (isLoading()) {
+    <div class="loading-spinner">⏳ טוען פרויקטים...</div>
+}
+
+<button (click)="toggleAddProject()" [disabled]="isAdding()">
+    {{showAddProjectForm ? 'ביטול' : 'הוסף פרויקט'}}
+</button>
+
+@if (showAddProjectForm) {
+    <form [formGroup]="addProjectForm" (ngSubmit)="addProject()">
+      <input formControlName="name" placeholder="שם הפרויקט" />
+      <input formControlName="description" placeholder="תיאור" />
+      
+      <select formControlName="priority">
+        <option value="low">עדיפות נמוכה</option>
+        <option value="normal">עדיפות רגילה</option>
+        <option value="high">עדיפות גבוהה</option>
+      </select>
+      
+      @if (isTeamPage()) {
+        <div class="info-message">
+          הפרויקט יתווסף לצוות: {{ getTeamName(teamId!) }}
+        </div>
+      } @else {
+        <select formControlName="teamId">
+          <option value="0" disabled>בחר צוות</option>
+          @for (team of teams(); track team.id) {
+              <option [value]="team.id">{{ team.name }}</option>
+          }
+        </select>
+      }
+      
+      <button type="submit" [disabled]="addProjectForm.invalid || isAdding()">
+        {{ isAdding() ? '⏳ מוסיף...' : 'הוסף פרויקט' }}
+      </button>
+    </form>
+   
+}
+
+@if (teamId === null) {
+    <h2>All Projects</h2>
+} @else {
+    <h2>Projects for Team: {{ getTeamName(teamId) }}</h2>
+}
+
+@for (project of filredProjects(); track project.id) {
+
+    <div class="project-card">
+        <h3>{{ project.name }}</h3>
+        <p>Description: {{ project.description }}</p>
+        @if (project.priority) {
+            <p>עדיפות: 
+                @if (project.priority === 'low') { נמוכה }
+                @else if (project.priority === 'normal') { רגילה }
+                @else if (project.priority === 'high') { גבוהה }
+            </p>
+        }
+        <p>Created At: {{ project.created_at }}</p>
+    </div>
+    <a [routerLink]="['/tasks', project.id]">Show {{project.name}} Tasks</a>
+   
+}
+@empty {
+    <p>No projects found.</p>
+}
+
+
+
+

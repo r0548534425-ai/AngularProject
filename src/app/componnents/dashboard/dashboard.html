@@ -1,0 +1,143 @@
+<div class="dashboard-container">
+  @if (isLoading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>⏳ טוען נתונים...</p>
+    </div>
+  } @else {
+    <!-- כותרת ראשית -->
+    <section class="welcome-section">
+      <h1>{{ getGreeting() }}, {{ currentUser()?.name || 'משתמש' }}! 👋</h1>
+      <p class="subtitle">ברוך הבא למערכת ניהול המשימות שלך. הנה סקירה מהירה של הפעילות שלך.</p>
+    </section>
+
+    <!-- סטטיסטיקות -->
+    <section class="stats-grid">
+      <div class="stat-card tasks-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <h3>{{ totalTasks() }}</h3>
+          <p>סך כל המשימות</p>
+        </div>
+      </div>
+
+      <div class="stat-card completed-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ completedTasks() }}</h3>
+          <p>משימות שהושלמו</p>
+        </div>
+      </div>
+
+      <div class="stat-card pending-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <h3>{{ pendingTasks() }}</h3>
+          <p>ממתינות לביצוע</p>
+        </div>
+      </div>
+
+      <div class="stat-card progress-card">
+        <div class="stat-icon">🔄</div>
+        <div class="stat-content">
+          <h3>{{ inProgressTasks() }}</h3>
+          <p>בתהליך ביצוע</p>
+        </div>
+      </div>
+
+      <div class="stat-card projects-card">
+        <div class="stat-icon">📁</div>
+        <div class="stat-content">
+          <h3>{{ totalProjects() }}</h3>
+          <p>פרויקטים פעילים</p>
+        </div>
+      </div>
+
+      <div class="stat-card teams-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>{{ totalTeams() }}</h3>
+          <p>צוותים</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- משימות אחרונות -->
+    <section class="recent-tasks-section">
+      <div class="section-header">
+        <h2>📌 המשימות האחרונות שלך</h2>
+        <a [routerLink]="['/tasks']" class="view-all-link">צפה בכל המשימות →</a>
+      </div>
+
+      @if (recentTasks().length > 0) {
+        <div class="tasks-list">
+          @for (task of recentTasks(); track task.id) {
+            <div class="task-item">
+              <div class="task-status" [class]="'status-' + task.status"></div>
+              <div class="task-details">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.description }}</p>
+                <div class="task-meta">
+                  <span class="task-date">📅 {{ task.due_date || 'ללא תאריך יעד' }}</span>
+                  <span class="task-priority" [class]="'priority-' + task.priority">
+                    {{ task.priority === 'high' ? '🔴 גבוה' : task.priority === 'medium' ? '🟡 בינוני' : '🟢 נמוך' }}
+                  </span>
+                </div>
+              </div>
+              <a [routerLink]="['/tasks', task.id, 'comments']" class="task-link">פרטים →</a>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>🎉 אין משימות כרגע. התחל ביצירת משימה חדשה!</p>
+        </div>
+      }
+    </section>
+
+    <!-- קישורים מהירים -->
+    <section class="quick-actions-section">
+      <h2>⚡ פעולות מהירות</h2>
+      <div class="quick-actions-grid">
+        <a [routerLink]="['/tasks']" class="action-card">
+          <div class="action-icon">📋</div>
+          <h3>המשימות שלי</h3>
+          <p>צפה בכל המשימות ונהל את העבודה שלך</p>
+        </a>
+
+        <a [routerLink]="['/projects']" class="action-card">
+          <div class="action-icon">📁</div>
+          <h3>הפרויקטים שלי</h3>
+          <p>עקוב אחר הפרויקטים הפעילים</p>
+        </a>
+
+        <a [routerLink]="['/teams']" class="action-card">
+          <div class="action-icon">👥</div>
+          <h3>הצוותים שלי</h3>
+          <p>שתף פעולה עם חברי הצוות</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- סיכום -->
+    <section class="summary-section">
+      <div class="summary-card">
+        <h3>💡 טיפ של היום</h3>
+        <p>ארגן את המשימות שלך לפי עדיפות כדי להישאר פרודוקטיבי ולהשיג את היעדים שלך במהירות!</p>
+      </div>
+
+      <div class="summary-card">
+        <h3>📊 הביצועים שלך</h3>
+        @if (totalTasks() > 0) {
+          <p>השלמת <strong>{{ completedTasks() }}</strong> מתוך <strong>{{ totalTasks() }}</strong> משימות 
+             (<strong>{{ ((completedTasks() / totalTasks()) * 100).toFixed(0) }}%</strong>).</p>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(completedTasks() / totalTasks()) * 100"></div>
+          </div>
+        } @else {
+          <p>התחל ביצירת משימות כדי לעקוב אחר ההתקדמות שלך!</p>
+        }
+      </div>
+    </section>
+  }
+</div>

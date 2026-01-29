@@ -1,0 +1,7 @@
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <input type="email" formControlName="email" placeholder="אימייל">
+        <input type="password" formControlName="password" placeholder="סיסמה">
+        <button type="submit" [disabled]="loginForm.invalid">Login</button>
+        <p>עדיין לא נרשמת? <a routerLink="/register">הרשם כאן</a></p>
+      
+    </form>

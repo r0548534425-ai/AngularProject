@@ -1,0 +1,31 @@
+<h1>תגובות ל-{{getTaskName(taskId!)}}</h1>
+
+@if (isLoading()) {
+    <div class="loading-spinner">⏳ טוען תגובות...</div>
+}
+
+<button (click)="toggleAddComment()" [disabled]="isAdding()">
+    {{showAddCommentForm ? 'ביטול' : 'הוסף תגובה'}}
+</button>
+
+@for (comment of comments(); track comment.id) {
+
+    <div class="comment-card">
+        <h2>{{ comment.body }}</h2>
+        <p>מאת: {{ comment.author_name }}</p>
+        <p>נוצר בתאריך: {{ comment.created_at }}</p>
+    </div>
+}
+   
+@empty {
+    <p>אין תגובות.</p>
+}
+@if (showAddCommentForm) {
+    <form [formGroup]="commentForm" (ngSubmit)="addComment()" class="add-form">
+        <textarea formControlName="body" placeholder="תוכן התגובה"></textarea>
+        <button type="submit" [disabled]="commentForm.invalid || isAdding()">
+            {{ isAdding() ? '⏳ מוסיף...' : 'הוסף תגובה' }}
+        </button>
+    </form>
+}
+    

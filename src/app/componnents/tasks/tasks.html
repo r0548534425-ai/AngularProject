@@ -1,0 +1,79 @@
+@if (projectId) {
+    <h2>Tasks for Project: {{ getProjectName(projectId) }}</h2>
+} @else {
+    <h2>All Tasks</h2>
+}
+
+@if (isLoading()) {
+    <div class="loading-spinner">⏳ טוען משימות...</div>
+}
+
+<button (click)="toggleAddTask()" [disabled]="isAdding()">
+    {{showAddTaskForm ? 'ביטול' : 'הוסף משימה'}}
+</button>
+
+@if( showAddTaskForm) {
+    <form [formGroup]="addTaskForm" (ngSubmit)="addTask()" class="add-form">
+    <select formControlName="project_id">
+        <option value="" disabled selected>בחר פרויקט</option>
+        @for (project of projects(); track project.id) {
+            <option [value]="project.id">{{ project.name }}</option>
+        }
+    </select>
+    <input formControlName="title" placeholder="כותרת המשימה">
+    <button type="submit" [disabled]="addTaskForm.invalid || isAdding()">
+        {{ isAdding() ? '⏳ מוסיף...' : 'הוסף משימה' }}
+    </button>
+    </form>
+}
+@for (task of filteredTasks(); track task.id) {
+      
+    @if (editingTaskId === task.id) {
+        <form [formGroup]="editTaskForm" (ngSubmit)="saveEdit()">
+            <input formControlName="title" placeholder="כותרת המשימה" />
+            <input formControlName="description" placeholder="תיאור" />
+            <select formControlName="status">
+                <option value="" disabled>בחר סטטוס</option>
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+            <select formControlName="priority">
+                <option value="" disabled>בחר עדיפות</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <select formControlName="assignee_id">
+                <option value="">לא משוייך</option>
+                @for (user of users(); track user.id) {
+                    <option [value]="user.id">{{ user.name }}</option>
+                }
+            </select>
+            <label>תאריך יעד:</label>
+            <input formControlName="due_date" type="date" />
+            <button type="submit" [disabled]="editTaskForm.invalid || isUpdating()">
+                {{ isUpdating() ? '⏳ שומר...' : 'שמור' }}
+            </button>
+            <button type="button" (click)="cancelEdit()" [disabled]="isUpdating()">ביטול</button>
+        </form>
+        
+       
+
+    } @else {
+        <div class="task-card">
+            <h3>{{ task.title }}</h3>
+            <p>תיאור: {{ task.description || 'אין תיאור' }}</p>
+            <p>סטטוס: {{ task.status || 'לא הוגדר' }}</p>
+            <p>עדיפות: {{ task.priority || 'לא הוגדר' }}</p>
+            <p>משוייך ל: {{ getUserName(task.assignee_id) || 'לא משוייך' }}</p>
+            <p>תאריך יעד: {{ task.due_date || 'לא הוגדר' }}</p>
+            <p>נוצר בתאריך: {{ task.created_at }}</p>
+            <button (click)="startEdit(task)" [disabled]="isDeleting()">ערוך</button>
+            <button (click)="deleteTask(task.id)" [disabled]="isDeleting()">
+                {{ isDeleting() ? '⏳ מוחק...' : 'מחק' }}
+            </button>
+            <a [routerLink]="['/comments', task.id]">תגובות</a>
+        </div>
+    }
+}

@@ -1,0 +1,8 @@
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <input type="text" formControlName="name" placeholder="שם משתמש">
+    <input type="email" formControlName="email" placeholder="אימייל">
+    <input type="password" formControlName="password" placeholder="סיסמה">
+    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+    <p>כבר יש לך משתמש? <a routerLink="/login">התחבר כאן</a></p>
+</form>

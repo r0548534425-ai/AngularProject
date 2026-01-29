@@ -1,0 +1,56 @@
+
+
+
+
+@if (isLoading()) {
+    <div class="loading-spinner">⏳ טוען צוותים...</div>
+}
+
+<button (click)="toggleForm()" [disabled]="isAdding()">
+{{ showAddTeamForm ? 'ביטול' : 'הוסף צוות חדש' }}
+</button>
+@if (showAddTeamForm) {
+    <form [formGroup]="addTeamForm" (ngSubmit)="addTeam()">
+      <input formControlName="name" placeholder="שם הצוות" />
+      <button type="submit" [disabled]="addTeamForm.invalid || isAdding()">
+        {{ isAdding() ? '⏳ מוסיף...' : 'הוסף צוות' }}
+      </button>
+    </form>
+}
+
+   
+@for (team of teams(); track $index) {
+
+    <div class="team-card">
+        <h3>{{ team.name }}</h3>
+        <p>נוצר בתאריך: {{ team.created_at }}</p>
+        <p>מספר חברים: {{ team.members_count }}</p>
+    </div>
+    <button (click)="toggleMember(team.id)" [disabled]="isAddingMember()"> 
+        {{selectedTeamId === team.id ? 'ביטול' : 'הוסף חבר'}}
+    </button>
+    @if( selectedTeamId === team.id) {
+        <form [formGroup]="addMemberForm" (ngSubmit)="addMemberToTeam()">
+            <select formControlName="userId">
+                <option value="">בחר משתמש</option>
+                @for (user of users(); track user.id) {
+                    <option [value]="user.id">{{ user.name }}</option>
+                }
+            </select>
+            <input formControlName="role" placeholder="תפקיד" />
+            <button type="submit" [disabled]="addMemberForm.invalid || isAddingMember()">
+                {{ isAddingMember() ? '⏳ מוסיף...' : 'הוסף' }}
+            </button>
+           
+        
+        </form>
+    }
+ <a [routerLink]="['/projects', team.id]">הצג פרויקטים של {{ team.name }}</a>
+
+
+
+}
+
+@empty {
+    <p>אין צוותים זמינים.</p>
+}
