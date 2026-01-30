@@ -10,7 +10,7 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private http = inject(HttpClient); 
   private router = inject(Router);
-  private apiUrl = 'https://angulaerserver.onrender.com/api';
+  private apiUrl = 'https://angulaerserver.onrender.com/api/auth';
   isLogged = signal<boolean>(!!sessionStorage.getItem('token'));
   
   currentUser = signal<any | null>(
