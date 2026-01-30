@@ -9,7 +9,7 @@ import { TaskDetails } from '../../models/tasks.model';
 export class CommentService {
   
 private http = inject(HttpClient); 
-    private apiUrl = 'http://localhost:3000/api/comments';
+    private apiUrl = 'https://angulaerserver.onrender.com/api/comments/';
 
 
   addComment(comment:addComment) {
@@ -21,6 +21,12 @@ private http = inject(HttpClient);
   getComments(taskId: number|null) {
     return this.http.get<CommentDetails[]>(`${this.apiUrl}?taskId=${taskId}`,{
         headers:{ Authorization: `Bearer ${sessionStorage.getItem('token')}` }
+    });
+  }
+
+  deleteComment(commentId: number) {
+    return this.http.delete(`${this.apiUrl}${commentId}`, {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
     });
   }
   

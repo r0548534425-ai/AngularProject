@@ -10,7 +10,7 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private http = inject(HttpClient); 
   private router = inject(Router);
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = 'https://angulaerserver.onrender.com/api';
   isLogged = signal<boolean>(!!sessionStorage.getItem('token'));
   
   currentUser = signal<any | null>(
@@ -34,7 +34,7 @@ export class AuthService {
     );
   }
   getUsers() {
-    return this.http.get<any[]>(`http://localhost:3000/api/users`,{
+    return this.http.get<any[]>(`https://angulaerserver.onrender.com/users`,{
         headers:{ Authorization: `Bearer ${sessionStorage.getItem('token')}` }
     });
   }

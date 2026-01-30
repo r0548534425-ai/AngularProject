@@ -5,21 +5,45 @@ import { addComment, CommentDetails } from '../../models/comments.model';
 import { TaskDetails } from '../../models/tasks.model';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommentService } from '../../services/comments/comment-service';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-tasks-comment',
-  imports: [ReactiveFormsModule],  // ← תקן!
+  imports: [
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatListModule,
+    MatDividerModule,
+    MatExpansionModule
+  ],
   templateUrl: './tasks-comment.html',
   styleUrl: './tasks-comment.css',
 })
 export class TasksComment implements OnInit {
-  commentService = inject(CommentService);
-  taskService = inject(TaskServer);
-  fg = inject(FormBuilder);
+  private commentService = inject(CommentService);
+  private taskService = inject(TaskServer);
+  private fg = inject(FormBuilder);
+  private router = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
   comments = signal<CommentDetails[]>([]);
   tasks = signal<TaskDetails[]>([]);
-  router = inject(ActivatedRoute);
-  showAddCommentForm: boolean = false;
+  panelOpenState = signal(false);
   
   // Loading states
   isLoading = signal<boolean>(false);
@@ -30,6 +54,7 @@ export class TasksComment implements OnInit {
   });
 
   taskId: number | null = null;
+  taskTitle = signal<string>('');
   
   ngOnInit() {
     this.router.paramMap.subscribe(params => {
@@ -80,20 +105,49 @@ export class TasksComment implements OnInit {
         console.log('Comment added successfully', res);
         this.commentForm.reset();
         this.commentForm.enable();
-        this.showAddCommentForm = false;
+        this.panelOpenState.set(false);
         this.loadComments(this.taskId!);
         this.isAdding.set(false);
+        
+        this.snackBar.open('✅ התגובה נוספה בהצלחה!', 'סגור', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to add comment', err);
         this.commentForm.enable();
         this.isAdding.set(false);
+        
+        this.snackBar.open('❌ שגיאה בהוספת התגובה', 'סגור', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
-  
-  toggleAddComment() {
-    this.showAddCommentForm = !this.showAddCommentForm;
+
+  deleteComment(commentId: number) {
+    if (confirm('האם אתה בטוח שברצונך למחוק את התגובה?')) {
+      this.commentService.deleteComment(commentId).subscribe({
+        next: () => {
+          this.comments.set(this.comments().filter(c => c.id !== commentId));
+          
+          this.snackBar.open('✅ התגובה נמחקה בהצלחה', 'סגור', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        },
+        error: (error: any) => {
+          console.error('Error deleting comment:', error);
+          
+          this.snackBar.open('❌ שגיאה במחיקת התגובה', 'סגור', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+    }
   }
 
   getTaskName(taskId: number): string {

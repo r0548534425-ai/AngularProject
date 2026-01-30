@@ -1,0 +1,39 @@
+.footer-toolbar {
+  background-color: #263238 !important;
+  color: rgba(255, 255, 255, 0.87);
+  margin-top: auto;
+  min-height: 56px;
+}
+
+.footer-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.footer-content mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    font-size: 12px;
+  }
+  
+  .footer-content mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}

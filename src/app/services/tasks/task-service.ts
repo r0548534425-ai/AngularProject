@@ -9,7 +9,7 @@ import { addComment, CommentDetails, CommentsResponse } from '../../models/comme
 })
 export class TaskServer {
   private http = inject(HttpClient); 
-    private apiUrl = 'http://localhost:3000/api/tasks';
+    private apiUrl = 'https://angulaerserver.onrender.com/api/tasks';
     
   getTasks() {
     return this.http.get<any[]>(this.apiUrl,{

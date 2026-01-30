@@ -1,78 +1,185 @@
-
-
-
-
-
-@if (isLoading()) {
-    <div class="loading-spinner">⏳ טוען פרויקטים...</div>
-}
-
-<button (click)="toggleAddProject()" [disabled]="isAdding()">
-    {{showAddProjectForm ? 'ביטול' : 'הוסף פרויקט'}}
-</button>
-
-@if (showAddProjectForm) {
-    <form [formGroup]="addProjectForm" (ngSubmit)="addProject()">
-      <input formControlName="name" placeholder="שם הפרויקט" />
-      <input formControlName="description" placeholder="תיאור" />
-      
-      <select formControlName="priority">
-        <option value="low">עדיפות נמוכה</option>
-        <option value="normal">עדיפות רגילה</option>
-        <option value="high">עדיפות גבוהה</option>
-      </select>
-      
-      <!-- Debug info -->
-      <div style="background: #ffeb3b; padding: 5px; margin: 5px 0;">
-        DEBUG: teamId = {{ teamId }}, isTeamPage = {{ isTeamPage() }}, formTeamId = {{ addProjectForm.get('teamId')?.value }}
-      </div>
-      
-      @if (isTeamPage()) {
-        <div class="info-message">
-          הפרויקט יתווסף לצוות: {{ getTeamName(teamId!) }}
-        </div>
-      } @else {
-        <select formControlName="teamId">
-          <option value="0" disabled>בחר צוות</option>
-          @for (team of teams(); track team.id) {
-              <option [value]="team.id">{{ team.name }}</option>
-          }
-        </select>
+<div class="projects-container">
+  <div class="projects-header">
+    <h1>
+      <mat-icon>folder</mat-icon>
+      פרויקטים
+      @if (teamId !== null) {
+        <mat-chip>{{ getTeamName(teamId) }}</mat-chip>
       }
-      
-      <button type="submit" [disabled]="addProjectForm.invalid || isAdding()">
-        {{ isAdding() ? '⏳ מוסיף...' : 'הוסף פרויקט' }}
-      </button>
-    </form>
-   
-}
+    </h1>
+    <button mat-raised-button color="primary" (click)="panelOpenState.set(!panelOpenState())">
+      <mat-icon>add</mat-icon>
+      פרויקט חדש
+    </button>
+  </div>
 
-@if (teamId === null) {
-    <h2>All Projects</h2>
-} @else {
-    <h2>Projects for Team: {{ getTeamName(teamId) }}</h2>
-}
-
-@for (project of filredProjects(); track project.id) {
-
-    <div class="project-card">
-        <h3>{{ project.name }}</h3>
-        <p>Description: {{ project.description }}</p>
-        @if (project.priority) {
-            <p>עדיפות: 
-                @if (project.priority === 'low') { נמוכה }
-                @else if (project.priority === 'normal') { רגילה }
-                @else if (project.priority === 'high') { גבוהה }
-            </p>
+  <!-- Add Project Form -->
+  <mat-expansion-panel [(expanded)]="panelOpenState" class="add-form-panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon>add_circle</mat-icon>
+        הוסף פרויקט חדש
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    
+    <form [formGroup]="addProjectForm" (ngSubmit)="addProject()" class="add-project-form">
+      <mat-form-field appearance="fill">
+        <mat-label>שם הפרויקט</mat-label>
+        <mat-icon matPrefix>text_fields</mat-icon>
+        <input matInput formControlName="name" placeholder="שם הפרויקט">
+        @if (addProjectForm.get('name')?.invalid && addProjectForm.get('name')?.touched) {
+          <mat-error>שם הפרויקט הוא שדה חובה</mat-error>
         }
-        <p>Created At: {{ project.created_at }}</p>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>תיאור</mat-label>
+        <mat-icon matPrefix>description</mat-icon>
+        <textarea matInput formControlName="description" rows="3" placeholder="תיאור הפרויקט"></textarea>
+        @if (addProjectForm.get('description')?.invalid && addProjectForm.get('description')?.touched) {
+          <mat-error>תיאור הפרויקט הוא שדה חובה</mat-error>
+        }
+      </mat-form-field>
+
+      @if (teamId === null) {
+        <mat-form-field appearance="fill">
+          <mat-label>צוות</mat-label>
+          <mat-icon matPrefix>group</mat-icon>
+          <mat-select formControlName="teamId">
+            <mat-option [value]="0">בחר צוות</mat-option>
+            @for (team of teams(); track team.id) {
+              <mat-option [value]="team.id">{{ team.name }}</mat-option>
+            }
+          </mat-select>
+          @if (addProjectForm.get('teamId')?.invalid && addProjectForm.get('teamId')?.touched) {
+            <mat-error>יש לבחור צוות</mat-error>
+          }
+        </mat-form-field>
+      } @else {
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <span>הפרויקט יתווסף לצוות: <strong>{{ getTeamName(teamId) }}</strong></span>
+        </div>
+      }
+
+      <mat-form-field appearance="fill">
+        <mat-label>עדיפות</mat-label>
+        <mat-icon matPrefix>flag</mat-icon>
+        <mat-select formControlName="priority">
+          <mat-option value="low">נמוכה</mat-option>
+          <mat-option value="normal">רגילה</mat-option>
+          <mat-option value="high">גבוהה</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="isAdding() || addProjectForm.invalid">
+          @if (isAdding()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          שמור פרויקט
+        </button>
+        <button mat-button type="button" (click)="panelOpenState.set(false)">
+          <mat-icon>cancel</mat-icon>
+          ביטול
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>טוען פרויקטים...</p>
     </div>
-    <a [routerLink]="['/tasks', project.id]">Show {{project.name}} Tasks</a>
-   
-}
-@empty {
-    <p>No projects found.</p>
-}
+  }
+
+  <!-- Projects Grid -->
+  @if (!isLoading()) {
+    <div class="projects-grid">
+      @for (project of filredProjects(); track project.id) {
+        <mat-card class="project-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>folder_open</mat-icon>
+            <mat-card-title>{{ project.name }}</mat-card-title>
+            <mat-card-subtitle>{{ getTeamName(project.team_id) }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <p class="project-description">{{ project.description }}</p>
+            
+            <div class="project-meta">
+              <mat-chip-set>
+                <mat-chip [class]="'priority-' + project.priority">
+                  <mat-icon>flag</mat-icon>
+                  {{ project.priority === 'low' ? 'נמוכה' : project.priority === 'high' ? 'גבוהה' : 'רגילה' }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <a mat-button [routerLink]="['/tasks', project.id]" color="primary">
+              <mat-icon>task</mat-icon>
+              משימות
+            </a>
+            <button mat-button (click)="toggleProjectTasks(project.id)" color="accent">
+              <mat-icon>visibility</mat-icon>
+              {{ showProjectTasks === project.id ? 'הסתר' : 'הצג' }} משימות
+            </button>
+            <button mat-button (click)="deleteProject(project.id)" color="warn">
+              <mat-icon>delete</mat-icon>
+              מחק
+            </button>
+          </mat-card-actions>
+
+          <!-- Task List -->
+          @if (showProjectTasks === project.id) {
+            <mat-card-content class="tasks-section">
+              @if (isLoadingTasks()) {
+                <div class="loading-mini">
+                  <mat-spinner diameter="30"></mat-spinner>
+                  <span>טוען משימות...</span>
+                </div>
+              } @else {
+                @if (projectTasks().length === 0) {
+                  <p class="no-tasks">אין משימות בפרויקט זה</p>
+                } @else {
+                  <div class="tasks-list">
+                    <h4><mat-icon>task_alt</mat-icon> משימות הפרויקט</h4>
+                    @for (task of projectTasks(); track task.id) {
+                      <div class="task-item">
+                        <div class="task-info">
+                          <strong>{{ task.title }}</strong>
+                          <mat-chip-set>
+                            <mat-chip [class]="'status-' + task.status">
+                              {{ task.status === 'todo' ? 'לביצוע' : task.status === 'in_progress' ? 'בביצוע' : 'הושלם' }}
+                            </mat-chip>
+                          </mat-chip-set>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            </mat-card-content>
+          }
+        </mat-card>
+      }
+    </div>
+
+    @if (filredProjects().length === 0) {
+      <div class="empty-state">
+        <mat-icon>folder_off</mat-icon>
+        <h3>אין פרויקטים</h3>
+        <p>לחץ על "פרויקט חדש" כדי להתחיל</p>
+      </div>
+    }
+  }
+</div>
 
 
 

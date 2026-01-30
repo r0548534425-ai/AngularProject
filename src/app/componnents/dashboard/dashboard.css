@@ -1,0 +1,250 @@
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  gap: 16px;
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+}
+
+.welcome-section h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2.5rem;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.welcome-section p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Statistics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.stat-card mat-card-content {
+  padding: 24px !important;
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-header mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+/* Card Colors */
+.tasks-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.completed-card {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%) !important;
+}
+
+.progress-card {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+}
+
+.pending-card {
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%) !important;
+}
+
+.projects-card {
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%) !important;
+}
+
+.teams-card {
+  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%) !important;
+}
+
+/* Content Grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.activity-card {
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-card mat-card-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.activity-card mat-card-header {
+  background-color: #f5f5f5;
+  padding: 16px;
+}
+
+.activity-card mat-icon[mat-card-avatar] {
+  background-color: #3f51b5;
+  color: white;
+  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 32px;
+  font-style: italic;
+}
+
+.status-icon-todo {
+  color: #9e9e9e;
+}
+
+.status-icon-in_progress {
+  color: #ff9800;
+}
+
+.status-icon-completed {
+  color: #4caf50;
+}
+
+.status-todo {
+  background-color: #9e9e9e !important;
+  color: white !important;
+}
+
+.status-in_progress {
+  background-color: #ff9800 !important;
+  color: white !important;
+}
+
+.status-completed {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+/* Quick Actions */
+.quick-actions-card {
+  margin-bottom: 32px;
+}
+
+.quick-actions-card mat-card-header {
+  background-color: #f5f5f5;
+  padding: 16px;
+}
+
+.quick-actions-card mat-icon[mat-card-avatar] {
+  background-color: #ff9800;
+  color: white;
+  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.quick-actions button {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .welcome-section h1 {
+    font-size: 1.8rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+  }
+
+  .quick-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

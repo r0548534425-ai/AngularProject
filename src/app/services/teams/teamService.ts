@@ -8,7 +8,7 @@ import { addMember, addTeam } from '../../models/teams.model';
 })
 export class TeamService {
     private http = inject(HttpClient); 
-    private apiUrl = 'http://localhost:3000/api/teams';
+    private apiUrl = 'https://angulaerserver.onrender.com/api/teams';
     
   getTeams() {
     return this.http.get<any[]>(`${this.apiUrl}`,{
@@ -33,6 +33,10 @@ export class TeamService {
       }
       );
     }
-   
 
+    deleteTeam(teamId: number) {
+      return this.http.delete(`${this.apiUrl}/${teamId}`, {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
+      });
+    }
 }

@@ -1,0 +1,94 @@
+.register-container {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+}
+
+.register-card {
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px !important;
+}
+
+.register-header {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.register-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #3f51b5;
+  margin-bottom: 16px;
+}
+
+mat-card-title {
+  font-size: 28px !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+
+mat-card-subtitle {
+  font-size: 14px !important;
+  opacity: 0.7;
+}
+
+mat-card-content {
+  padding: 24px !important;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.submit-button {
+  height: 48px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submit-button mat-spinner {
+  display: inline-block;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.login-link p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.login-link a {
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .register-card {
+    max-width: 100%;
+  }
+
+  mat-card-title {
+    font-size: 24px !important;
+  }
+
+  .register-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+}

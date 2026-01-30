@@ -1,56 +1,149 @@
-
-
-
-
-@if (isLoading()) {
-    <div class="loading-spinner">⏳ טוען צוותים...</div>
-}
-
-<button (click)="toggleForm()" [disabled]="isAdding()">
-{{ showAddTeamForm ? 'ביטול' : 'הוסף צוות חדש' }}
-</button>
-@if (showAddTeamForm) {
-    <form [formGroup]="addTeamForm" (ngSubmit)="addTeam()">
-      <input formControlName="name" placeholder="שם הצוות" />
-      <button type="submit" [disabled]="addTeamForm.invalid || isAdding()">
-        {{ isAdding() ? '⏳ מוסיף...' : 'הוסף צוות' }}
-      </button>
-    </form>
-}
-
-   
-@for (team of teams(); track $index) {
-
-    <div class="team-card">
-        <h3>{{ team.name }}</h3>
-        <p>נוצר בתאריך: {{ team.created_at }}</p>
-        <p>מספר חברים: {{ team.members_count }}</p>
-    </div>
-    <button (click)="toggleMember(team.id)" [disabled]="isAddingMember()"> 
-        {{selectedTeamId === team.id ? 'ביטול' : 'הוסף חבר'}}
+<div class="teams-container">
+  <div class="teams-header">
+    <h1>
+      <mat-icon>group</mat-icon>
+      צוותים
+    </h1>
+    <button mat-raised-button color="primary" (click)="panelOpenState.set(!panelOpenState())">
+      <mat-icon>add</mat-icon>
+      צוות חדש
     </button>
-    @if( selectedTeamId === team.id) {
-        <form [formGroup]="addMemberForm" (ngSubmit)="addMemberToTeam()">
-            <select formControlName="userId">
-                <option value="">בחר משתמש</option>
-                @for (user of users(); track user.id) {
-                    <option [value]="user.id">{{ user.name }}</option>
-                }
-            </select>
-            <input formControlName="role" placeholder="תפקיד" />
-            <button type="submit" [disabled]="addMemberForm.invalid || isAddingMember()">
-                {{ isAddingMember() ? '⏳ מוסיף...' : 'הוסף' }}
+  </div>
+
+  <!-- Add Team Form -->
+  <mat-expansion-panel [(expanded)]="panelOpenState" class="add-form-panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon>add_circle</mat-icon>
+        הוסף צוות חדש
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    
+    <form [formGroup]="addTeamForm" (ngSubmit)="addTeam()" class="add-team-form">
+      <mat-form-field appearance="fill">
+        <mat-label>שם הצוות</mat-label>
+        <mat-icon matPrefix>group</mat-icon>
+        <input matInput formControlName="name" placeholder="שם הצוות">
+        @if (addTeamForm.get('name')?.invalid && addTeamForm.get('name')?.touched) {
+          <mat-error>שם הצוות הוא שדה חובה</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="isAdding() || addTeamForm.invalid">
+          @if (isAdding()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          שמור צוות
+        </button>
+        <button mat-button type="button" (click)="panelOpenState.set(false)">
+          <mat-icon>cancel</mat-icon>
+          ביטול
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>טוען צוותים...</p>
+    </div>
+  }
+
+  <!-- Teams Grid -->
+  @if (!isLoading()) {
+    <div class="teams-grid">
+      @for (team of teams(); track team.id) {
+        <mat-card class="team-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>group</mat-icon>
+            <mat-card-title>{{ team.name }}</mat-card-title>
+            <mat-card-subtitle>
+              <mat-chip [matBadge]="team.members_count" matBadgeOverlap="false">
+                <mat-icon>person</mat-icon>
+                {{ team.members_count }} חברים
+              </mat-chip>
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="team-info">
+              <div class="info-item">
+                <mat-icon>event</mat-icon>
+                <span>נוצר: {{ team.created_at }}</span>
+              </div>
+            </div>
+
+            <!-- Add Member Section -->
+            <mat-expansion-panel 
+              [expanded]="addMemberPanelState() === team.id" 
+              (opened)="addMemberPanelState.set(team.id)"
+              (closed)="addMemberPanelState.set(null)"
+              class="member-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>person_add</mat-icon>
+                  הוסף חבר צוות
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              
+              <form [formGroup]="addMemberForm" (ngSubmit)="addMemberToTeam()" class="add-member-form">
+                <mat-form-field appearance="fill">
+                  <mat-label>בחר משתמש</mat-label>
+                  <mat-icon matPrefix>person</mat-icon>
+                  <mat-select formControlName="userId">
+                    <mat-option value="">בחר משתמש</mat-option>
+                    @for (user of users(); track user.id) {
+                      <mat-option [value]="user.id">{{ user.name }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>תפקיד</mat-label>
+                  <mat-icon matPrefix>work</mat-icon>
+                  <input matInput formControlName="role" placeholder="למשל: מפתח, מעצב">
+                </mat-form-field>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="accent" type="submit" 
+                          [disabled]="isAddingMember() || addMemberForm.invalid">
+                    @if (isAddingMember()) {
+                      <mat-spinner diameter="20"></mat-spinner>
+                    } @else {
+                      <mat-icon>person_add</mat-icon>
+                    }
+                    הוסף חבר
+                  </button>
+                </div>
+              </form>
+            </mat-expansion-panel>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <a mat-button [routerLink]="['/projects', team.id]" color="primary">
+              <mat-icon>folder</mat-icon>
+              פרויקטים
+            </a>
+            <button mat-button (click)="deleteTeam(team.id)" color="warn">
+              <mat-icon>delete</mat-icon>
+              מחק
             </button>
-           
-        
-        </form>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+
+    @if (teams().length === 0) {
+      <div class="empty-state">
+        <mat-icon>groups</mat-icon>
+        <h3>אין צוותים</h3>
+        <p>לחץ על "צוות חדש" כדי להתחיל</p>
+      </div>
     }
- <a [routerLink]="['/projects', team.id]">הצג פרויקטים של {{ team.name }}</a>
-
-
-
-}
-
-@empty {
-    <p>אין צוותים זמינים.</p>
-}
+  }
+</div>

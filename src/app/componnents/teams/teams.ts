@@ -4,10 +4,39 @@ import { TeamService } from '../../services/teams/teamService';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/authService';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatListModule } from '@angular/material/list';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-teams',
-  imports: [ReactiveFormsModule,RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatChipsModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatExpansionModule,
+    MatListModule,
+    MatBadgeModule,
+    MatDividerModule
+  ],
   templateUrl: './teams.html',
   styleUrl: './teams.css',
 })
@@ -20,20 +49,25 @@ export class Teams implements  OnInit {
   isLoading = signal<boolean>(false);
   isAdding = signal<boolean>(false);
   isAddingMember = signal<boolean>(false);
+  panelOpenState = signal(false);
+  addMemberPanelState = signal<number | null>(null);
   
-  private teamService=inject(TeamService);
-  private authService=inject(AuthService);
-    private fb = inject(FormBuilder);
-    showAddTeamForm : boolean = false
-    selectedTeamId: number | null = null;
-    teamId: number = 0;
-    addTeamForm = this.fb.group({
-      name: ['',[Validators.required]]
-    });
-    addMemberForm = this.fb.group({
-      userId: ['',[Validators.required]],
-      role: ['',[Validators.required]]
-    });
+  private teamService = inject(TeamService);
+  private authService = inject(AuthService);
+  private fb = inject(FormBuilder);
+  private snackBar = inject(MatSnackBar);
+
+  selectedTeamId: number | null = null;
+  teamId: number = 0;
+  
+  addTeamForm = this.fb.group({
+    name: ['', [Validators.required]]
+  });
+  
+  addMemberForm = this.fb.group({
+    userId: ['', [Validators.required]],
+    role: ['', [Validators.required]]
+  });
 
   ngOnInit() {
 
@@ -71,11 +105,6 @@ export class Teams implements  OnInit {
     });
   }
 
-
-  
-  toggleForm() {
-    this.showAddTeamForm = !this.showAddTeamForm;
-  }
   toggleMember(teamId: number) {
     this.selectedTeamId = this.selectedTeamId === teamId ? null : teamId;
     this.teamId = teamId;
@@ -97,14 +126,24 @@ export class Teams implements  OnInit {
         const teamWithCount = { ...res, members_count: res.members_count || 0 };
         this.addTeamForm.reset();
         this.addTeamForm.enable();
-        this.showAddTeamForm = false
+        this.panelOpenState.set(false);
         this.loadTeams();
         this.isAdding.set(false);
+        
+        this.snackBar.open('✅ הצוות נוסף בהצלחה!', 'סגור', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
       },
-      error:(err)=>{
+      error:(err: any)=>{
         console.error('Adding team failed', err);
         this.addTeamForm.enable();
         this.isAdding.set(false);
+        
+        this.snackBar.open('❌ שגיאה בהוספת הצוות', 'סגור', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     }
       );
@@ -124,26 +163,53 @@ export class Teams implements  OnInit {
       next:(res)=>{
         console.log('Member added successfully:', res);
         
-        // עדכן את הצוות עם המספר החדש מהשרת
-        this.teams.update(teams => 
-          teams.map(team => 
-            team.id === this.selectedTeamId 
-              ? { ...team, members_count: res.members_count || (team.members_count || 0) + 1 }  
-              : team
-          )
-        );
+        // טען מחדש את כל הצוותים מהשרת כדי לקבל את המספר האמיתי
+        this.loadTeams();
+        
         this.addMemberForm.reset();
         this.addMemberForm.enable();
         this.selectedTeamId = null;
         this.isAddingMember.set(false);
+        
+        this.snackBar.open('✅ חבר צוות נוסף בהצלחה!', 'סגור', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
       },
-      error:(err)=>{
+      error:(err: any)=>{
         console.error('Adding member failed', err); 
         this.addMemberForm.enable();
         this.isAddingMember.set(false);
+        
+        this.snackBar.open('❌ שגיאה בהוספת חבר צוות', 'סגור', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
+    });
+  }
+
+  deleteTeam(teamId: number) {
+    if (confirm('האם אתה בטוח שברצונך למחוק את הצוות?')) {
+      this.teamService.deleteTeam(teamId).subscribe({
+        next: () => {
+          this.teams.set(this.teams().filter(t => t.id !== teamId));
+          
+          this.snackBar.open('✅ הצוות נמחק בהצלחה', 'סגור', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        },
+        error: (error: any) => {
+          console.error('Error deleting team:', error);
+          
+          this.snackBar.open('❌ שגיאה במחיקת הצוות', 'סגור', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
     }
-      );
   }
 }
 

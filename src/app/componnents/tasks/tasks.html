@@ -1,79 +1,227 @@
-@if (projectId) {
-    <h2>Tasks for Project: {{ getProjectName(projectId) }}</h2>
-} @else {
-    <h2>All Tasks</h2>
-}
-
-@if (isLoading()) {
-    <div class="loading-spinner">⏳ טוען משימות...</div>
-}
-
-<button (click)="toggleAddTask()" [disabled]="isAdding()">
-    {{showAddTaskForm ? 'ביטול' : 'הוסף משימה'}}
-</button>
-
-@if( showAddTaskForm) {
-    <form [formGroup]="addTaskForm" (ngSubmit)="addTask()" class="add-form">
-    <select formControlName="project_id">
-        <option value="" disabled selected>בחר פרויקט</option>
-        @for (project of projects(); track project.id) {
-            <option [value]="project.id">{{ project.name }}</option>
-        }
-    </select>
-    <input formControlName="title" placeholder="כותרת המשימה">
-    <button type="submit" [disabled]="addTaskForm.invalid || isAdding()">
-        {{ isAdding() ? '⏳ מוסיף...' : 'הוסף משימה' }}
+<div class="tasks-container">
+  <div class="tasks-header">
+    <h1>
+      <mat-icon>task</mat-icon>
+      משימות
+      @if (projectId !== null) {
+        <mat-chip>{{ getProjectName(projectId) }}</mat-chip>
+      }
+    </h1>
+    <button mat-raised-button color="primary" (click)="panelOpenState.set(!panelOpenState())">
+      <mat-icon>add</mat-icon>
+      משימה חדשה
     </button>
-    </form>
-}
-@for (task of filteredTasks(); track task.id) {
-      
-    @if (editingTaskId === task.id) {
-        <form [formGroup]="editTaskForm" (ngSubmit)="saveEdit()">
-            <input formControlName="title" placeholder="כותרת המשימה" />
-            <input formControlName="description" placeholder="תיאור" />
-            <select formControlName="status">
-                <option value="" disabled>בחר סטטוס</option>
-                <option value="todo">To Do</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-            </select>
-            <select formControlName="priority">
-                <option value="" disabled>בחר עדיפות</option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-            <select formControlName="assignee_id">
-                <option value="">לא משוייך</option>
-                @for (user of users(); track user.id) {
-                    <option [value]="user.id">{{ user.name }}</option>
-                }
-            </select>
-            <label>תאריך יעד:</label>
-            <input formControlName="due_date" type="date" />
-            <button type="submit" [disabled]="editTaskForm.invalid || isUpdating()">
-                {{ isUpdating() ? '⏳ שומר...' : 'שמור' }}
-            </button>
-            <button type="button" (click)="cancelEdit()" [disabled]="isUpdating()">ביטול</button>
-        </form>
-        
-       
+  </div>
 
-    } @else {
-        <div class="task-card">
-            <h3>{{ task.title }}</h3>
-            <p>תיאור: {{ task.description || 'אין תיאור' }}</p>
-            <p>סטטוס: {{ task.status || 'לא הוגדר' }}</p>
-            <p>עדיפות: {{ task.priority || 'לא הוגדר' }}</p>
-            <p>משוייך ל: {{ getUserName(task.assignee_id) || 'לא משוייך' }}</p>
-            <p>תאריך יעד: {{ task.due_date || 'לא הוגדר' }}</p>
-            <p>נוצר בתאריך: {{ task.created_at }}</p>
-            <button (click)="startEdit(task)" [disabled]="isDeleting()">ערוך</button>
-            <button (click)="deleteTask(task.id)" [disabled]="isDeleting()">
-                {{ isDeleting() ? '⏳ מוחק...' : 'מחק' }}
-            </button>
-            <a [routerLink]="['/comments', task.id]">תגובות</a>
+  <!-- Add Task Form -->
+  <mat-expansion-panel [(expanded)]="panelOpenState" class="add-form-panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon>add_circle</mat-icon>
+        הוסף משימה חדשה
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    
+    <form [formGroup]="addTaskForm" (ngSubmit)="addTask()" class="add-task-form">
+      @if (projectId === null) {
+        <mat-form-field appearance="fill">
+          <mat-label>פרויקט</mat-label>
+          <mat-icon matPrefix>folder</mat-icon>
+          <mat-select formControlName="project_id">
+            <mat-option value="">בחר פרויקט</mat-option>
+            @for (project of projects(); track project.id) {
+              <mat-option [value]="project.id">{{ project.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      } @else {
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <span>המשימה תתווסף לפרויקט: <strong>{{ getProjectName(projectId) }}</strong></span>
         </div>
+      }
+
+      <mat-form-field appearance="fill">
+        <mat-label>כותרת המשימה</mat-label>
+        <mat-icon matPrefix>title</mat-icon>
+        <input matInput formControlName="title" placeholder="כותרת המשימה">
+        @if (addTaskForm.get('title')?.invalid && addTaskForm.get('title')?.touched) {
+          <mat-error>כותרת המשימה היא שדה חובה</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="isAdding() || addTaskForm.invalid">
+          @if (isAdding()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          שמור משימה
+        </button>
+        <button mat-button type="button" (click)="panelOpenState.set(false)">
+          <mat-icon>cancel</mat-icon>
+          ביטול
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>טוען משימות...</p>
+    </div>
+  }
+
+  <!-- Tasks List -->
+  @if (!isLoading()) {
+    <div class="tasks-list">
+      @for (task of filteredTasks(); track task.id) {
+        @if (editingTaskId === task.id) {
+          <!-- Edit Form -->
+          <mat-card class="task-card editing">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>edit</mat-icon>
+              <mat-card-title>עריכת משימה</mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <form [formGroup]="editTaskForm" (ngSubmit)="saveEdit()" class="edit-form">
+                <mat-form-field appearance="fill">
+                  <mat-label>כותרת</mat-label>
+                  <input matInput formControlName="title">
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>תיאור</mat-label>
+                  <textarea matInput formControlName="description" rows="3"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>סטטוס</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option value="todo">לביצוע</mat-option>
+                    <mat-option value="in_progress">בביצוע</mat-option>
+                    <mat-option value="completed">הושלם</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>עדיפות</mat-label>
+                  <mat-select formControlName="priority">
+                    <mat-option value="low">נמוכה</mat-option>
+                    <mat-option value="medium">בינונית</mat-option>
+                    <mat-option value="high">גבוהה</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>משוייך ל</mat-label>
+                  <mat-select formControlName="assignee_id">
+                    <mat-option [value]="null">לא משוייך</mat-option>
+                    @for (user of users(); track user.id) {
+                      <mat-option [value]="user.id">{{ user.name }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>תאריך יעד</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="due_date">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="isUpdating() || editTaskForm.invalid">
+                    @if (isUpdating()) {
+                      <mat-spinner diameter="20"></mat-spinner>
+                    } @else {
+                      <mat-icon>save</mat-icon>
+                    }
+                    שמור
+                  </button>
+                  <button mat-button type="button" (click)="cancelEdit()" [disabled]="isUpdating()">
+                    <mat-icon>cancel</mat-icon>
+                    ביטול
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        } @else {
+          <!-- Task Card -->
+          <mat-card class="task-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar [class]="'status-icon-' + task.status">
+                {{ task.status === 'completed' ? 'check_circle' : task.status === 'in_progress' ? 'pending' : 'radio_button_unchecked' }}
+              </mat-icon>
+              <mat-card-title>{{ task.title }}</mat-card-title>
+              <mat-card-subtitle>
+                <mat-chip-set>
+                  <mat-chip [class]="'status-' + task.status">
+                    {{ task.status === 'todo' ? 'לביצוע' : task.status === 'in_progress' ? 'בביצוע' : 'הושלם' }}
+                  </mat-chip>
+                  <mat-chip [class]="'priority-' + (task.priority || 'medium')">
+                    <mat-icon>flag</mat-icon>
+                    {{ task.priority === 'low' ? 'נמוכה' : task.priority === 'high' ? 'גבוהה' : 'בינונית' }}
+                  </mat-chip>
+                </mat-chip-set>
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <p class="task-description">{{ task.description || 'אין תיאור' }}</p>
+              
+              <div class="task-meta">
+                @if (task.assignee_id) {
+                  <div class="meta-item">
+                    <mat-icon>person</mat-icon>
+                    <span>{{ getUserName(task.assignee_id) }}</span>
+                  </div>
+                }
+                
+                @if (task.due_date) {
+                  <div class="meta-item">
+                    <mat-icon>event</mat-icon>
+                    <span>{{ task.due_date }}</span>
+                  </div>
+                }
+                
+                <div class="meta-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ task.created_at }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-button (click)="startEdit(task)" [disabled]="isDeleting()">
+                <mat-icon>edit</mat-icon>
+                ערוך
+              </button>
+              <button mat-button color="warn" (click)="deleteTask(task.id)" [disabled]="isDeleting()">
+                <mat-icon>delete</mat-icon>
+                מחק
+              </button>
+              <a mat-button [routerLink]="['/comments', task.id]" color="accent">
+                <mat-icon>comment</mat-icon>
+                תגובות
+              </a>
+            </mat-card-actions>
+          </mat-card>
+        }
+      }
+    </div>
+
+    @if (filteredTasks().length === 0) {
+      <div class="empty-state">
+        <mat-icon>task_alt</mat-icon>
+        <h3>אין משימות</h3>
+        <p>לחץ על "משימה חדשה" כדי להתחיל</p>
+      </div>
     }
-}
+  }
+</div>

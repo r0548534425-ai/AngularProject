@@ -1,20 +1,59 @@
-<header>
-    @if(isLogged())
-    {
-    <nav>
-        <a [routerLink]="['/dashboard']">Dashboard</a>
-        <a [routerLink]="['/teams']">Teams</a>
-        <a [routerLink]="['/projects']">Projects</a>
-        <a [routerLink]="['/tasks']">Tasks</a>
-        <span class="user-name">שלום, {{ currentUser?.name || 'משתמש' }}</span>
-        <button (click)="logout()">Logout</button>
-    </nav>
-}   @else
-    {
-    <nav>
-        <a [routerLink]="['/login']">Login</a>
-        <a [routerLink]="['/register']">Register</a>
-    </nav>
-}   
+<mat-toolbar color="primary" class="app-toolbar">
+  <div class="toolbar-container">
+    <div class="logo-section">
+      <mat-icon>work</mat-icon>
+      <span class="app-title">ניהול פרויקטים</span>
+    </div>
 
-</header>
+    @if(isLogged()) {
+      <nav class="nav-links">
+        <a mat-button [routerLink]="['/dashboard']" routerLinkActive="active-link">
+          <mat-icon>dashboard</mat-icon>
+          Dashboard
+        </a>
+        <a mat-button [routerLink]="['/teams']" routerLinkActive="active-link">
+          <mat-icon>groups</mat-icon>
+          צוותים
+        </a>
+        <a mat-button [routerLink]="['/projects']" routerLinkActive="active-link">
+          <mat-icon>folder</mat-icon>
+          פרויקטים
+        </a>
+        <a mat-button [routerLink]="['/tasks']" routerLinkActive="active-link">
+          <mat-icon>task</mat-icon>
+          משימות
+        </a>
+      </nav>
+
+      <div class="user-section">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-button">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <span class="user-name">{{ currentUser?.name || 'משתמש' }}</span>
+        
+        <mat-menu #userMenu="matMenu">
+          <div class="user-menu-header">
+            <mat-icon>person</mat-icon>
+            <span>{{ currentUser?.name }}</span>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>התנתקות</span>
+          </button>
+        </mat-menu>
+      </div>
+    } @else {
+      <nav class="nav-links">
+        <a mat-raised-button [routerLink]="['/login']" class="login-btn">
+          <mat-icon>login</mat-icon>
+          כניסה
+        </a>
+        <a mat-raised-button color="accent" [routerLink]="['/register']" class="register-btn">
+          <mat-icon>person_add</mat-icon>
+          הרשמה
+        </a>
+      </nav>
+    }
+  </div>
+</mat-toolbar>
