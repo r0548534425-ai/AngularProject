@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { userDetails } from '../../models/auth.model';
 import { addMember, addTeam } from '../../models/teams.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TeamService {
     private http = inject(HttpClient); 
-    private apiUrl = 'https://angulaerserver.onrender.com/api/teams';
+    private apiUrl = `${environment.apiUrl}/api/teams`;
     
   getTeams() {
     return this.http.get<any[]>(`${this.apiUrl}`,{

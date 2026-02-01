@@ -122,17 +122,13 @@
           </mat-card-content>
 
           <mat-card-actions>
-            <a mat-button [routerLink]="['/tasks', project.id]" color="primary">
+            <a mat-button [routerLink]="['/tasks', project.id]" color="primary" aria-label="עבור למשימות">
               <mat-icon>task</mat-icon>
               משימות
             </a>
-            <button mat-button (click)="toggleProjectTasks(project.id)" color="accent">
+            <button mat-button (click)="toggleProjectTasks(project.id)" color="accent" aria-label="הצג/הסתר משימות">
               <mat-icon>visibility</mat-icon>
               {{ showProjectTasks === project.id ? 'הסתר' : 'הצג' }} משימות
-            </button>
-            <button mat-button (click)="deleteProject(project.id)" color="warn">
-              <mat-icon>delete</mat-icon>
-              מחק
             </button>
           </mat-card-actions>
 

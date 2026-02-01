@@ -133,33 +133,32 @@ export class Projects {
         return;
       }
       
+      const formData = this.addProjectForm.getRawValue();
+      console.log('DEBUG: Form Data:', formData); // <--- Debug log
+      console.log('DEBUG: Selected Priority:', formData.priority); // <--- Debug log
+
       this.addProjectForm.disable();
       this.isAdding.set(true);
       
       // אם אנחנו בעמוד צוות מסוים, כפה את ה-teamId
-      const formData = this.addProjectForm.value;
       const newProject: addProjectect = {
         name: formData.name!,
         description: formData.description!,
-        priority: formData.priority!,
+        priority: formData.priority || 'normal',
         teamId: this.teamId !== null ? this.teamId : formData.teamId!
       };
       
-      console.log('Adding project:', newProject);
-      console.log('Current teamId from route:', this.teamId);
-      console.log('Is team page:', this.isTeamPage());
-      
       this.projectService.addProject(newProject).subscribe({
         next: (data) => {
-          console.log('Project added successfully:', data);
-          console.log('Project team_id:', data.team_id, 'Current filter teamId:', this.teamId);
+          // מיזוג המידע שהתקבל מהשרת עם המידע ששלחנו (למקרה שהשרת לא מחזיר את העדיפות)
+          const projectToAdd: ProjectDetails = {
+            ...data,
+            priority: data.priority || newProject.priority || 'normal'
+          };
           
           // רק אם הפרויקט שייך לצוות הנוכחי (או אין פילטר), הוסף אותו לרשימה
-          if (this.teamId === null || data.team_id === this.teamId) {
-            this.projects.set([...this.projects(), data]);
-            console.log('Project added to display list');
-          } else {
-            console.log('Project added to different team, not showing in current view');
+          if (this.teamId === null || projectToAdd.team_id === this.teamId) {
+            this.projects.set([...this.projects(), projectToAdd]);
           }
           
           this.addProjectForm.enable();
@@ -195,33 +194,6 @@ export class Projects {
           });
         },
       });
-}
-
-deleteProject(projectId: number) {
-  if (confirm('האם אתה בטוח שברצונך למחוק את הפרויקט?')) {
-    this.projectService.deleteProject(projectId).subscribe({
-      next: () => {
-        this.projects.set(this.projects().filter(p => p.id !== projectId));
-        
-        this.snackBar.open('✅ הפרויקט נמחק בהצלחה', 'סגור', {
-          duration: 3000,
-          panelClass: ['success-snackbar'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-      },
-      error: (error: any) => {
-        console.error('Error deleting project:', error);
-        
-        this.snackBar.open('❌ שגיאה במחיקת הפרויקט', 'סגור', {
-          duration: 3000,
-          panelClass: ['error-snackbar'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-      }
-    });
-  }
 }
 
 toggleProjectTasks(projectId: number) {

@@ -5,6 +5,7 @@ import { addComment, CommentDetails } from '../../models/comments.model';
 import { TaskDetails } from '../../models/tasks.model';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommentService } from '../../services/comments/comment-service';
+import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +21,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
   selector: 'app-tasks-comment',
   imports: [
     ReactiveFormsModule,
+    DatePipe,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -125,29 +127,6 @@ export class TasksComment implements OnInit {
         });
       }
     });
-  }
-
-  deleteComment(commentId: number) {
-    if (confirm('האם אתה בטוח שברצונך למחוק את התגובה?')) {
-      this.commentService.deleteComment(commentId).subscribe({
-        next: () => {
-          this.comments.set(this.comments().filter(c => c.id !== commentId));
-          
-          this.snackBar.open('✅ התגובה נמחקה בהצלחה', 'סגור', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-        },
-        error: (error: any) => {
-          console.error('Error deleting comment:', error);
-          
-          this.snackBar.open('❌ שגיאה במחיקת התגובה', 'סגור', {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
-    }
   }
 
   getTaskName(taskId: number): string {

@@ -198,15 +198,15 @@
             </mat-card-content>
 
             <mat-card-actions>
-              <button mat-button (click)="startEdit(task)" [disabled]="isDeleting()">
+              <button mat-button (click)="startEdit(task)" [disabled]="isDeleting()" aria-label="ערוך משימה">
                 <mat-icon>edit</mat-icon>
                 ערוך
               </button>
-              <button mat-button color="warn" (click)="deleteTask(task.id)" [disabled]="isDeleting()">
+              <button mat-button color="warn" (click)="deleteTask(task.id)" [disabled]="isDeleting()" aria-label="מחק משימה">
                 <mat-icon>delete</mat-icon>
                 מחק
               </button>
-              <a mat-button [routerLink]="['/comments', task.id]" color="accent">
+              <a mat-button [routerLink]="['/comments', task.id]" color="accent" aria-label="הצג תגובות">
                 <mat-icon>comment</mat-icon>
                 תגובות
               </a>

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { register, login, authResponse } from '../../models/auth.model';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private http = inject(HttpClient); 
   private router = inject(Router);
-  private apiUrl = 'https://angulaerserver.onrender.com/api/auth';
+  private apiUrl = `${environment.apiUrl}/api/auth`;
   isLogged = signal<boolean>(!!sessionStorage.getItem('token'));
   
   currentUser = signal<any | null>(
@@ -34,7 +35,7 @@ export class AuthService {
     );
   }
   getUsers() {
-    return this.http.get<any[]>(`https://angulaerserver.onrender.com/users`,{
+    return this.http.get<any[]>(`${environment.apiUrl}/api/users`,{
         headers:{ Authorization: `Bearer ${sessionStorage.getItem('token')}` }
     });
   }

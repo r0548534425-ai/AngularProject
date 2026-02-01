@@ -3,13 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { addTask , TaskDetails, updateTask } from '../../models/tasks.model';
 import { TasksComment } from '../../componnents/tasks-comment/tasks-comment';
 import { addComment, CommentDetails, CommentsResponse } from '../../models/comments.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskServer {
   private http = inject(HttpClient); 
-    private apiUrl = 'https://angulaerserver.onrender.com/api/tasks';
+    private apiUrl = `${environment.apiUrl}/api/tasks`;
     
   getTasks() {
     return this.http.get<any[]>(this.apiUrl,{

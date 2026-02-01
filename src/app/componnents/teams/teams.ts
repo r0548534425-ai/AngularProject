@@ -149,16 +149,40 @@ export class Teams implements  OnInit {
       );
   }
 
+  openAddMemberPanel(teamId: number) {
+    this.addMemberPanelState.set(teamId);
+    this.selectedTeamId = teamId;
+    this.addMemberForm.reset();
+    console.log('Opening add member panel for team:', teamId);
+  }
+
+  closeAddMemberPanel() {
+    this.addMemberPanelState.set(null);
+    this.selectedTeamId = null;
+    this.addMemberForm.reset();
+  }
+
   addMemberToTeam(){
-    if (this.selectedTeamId === null || this.addMemberForm.invalid || this.isAddingMember()) return;
+    console.log('addMemberToTeam called');
+    console.log('selectedTeamId:', this.selectedTeamId);
+    console.log('form valid:', !this.addMemberForm.invalid);
+    console.log('form value:', this.addMemberForm.value);
+    
+    if (this.selectedTeamId === null || this.addMemberForm.invalid || this.isAddingMember()) {
+      console.log('Form validation failed or already adding');
+      return;
+    }
     
     this.addMemberForm.disable();
     this.isAddingMember.set(true);
     
-    const data=this.addMemberForm.value as {
-      userId: string;
-      role: string;
-    }
+    const data = {
+      userId: this.addMemberForm.value.userId!,
+      role: this.addMemberForm.value.role!
+    };
+    
+    console.log('Sending data:', data);
+    
     this.teamService.addUserToTeam(data, this.selectedTeamId).subscribe({
       next:(res)=>{
         console.log('Member added successfully:', res);
@@ -168,6 +192,7 @@ export class Teams implements  OnInit {
         
         this.addMemberForm.reset();
         this.addMemberForm.enable();
+        this.addMemberPanelState.set(null);
         this.selectedTeamId = null;
         this.isAddingMember.set(false);
         
@@ -177,12 +202,16 @@ export class Teams implements  OnInit {
         });
       },
       error:(err: any)=>{
-        console.error('Adding member failed', err); 
+        console.error('Adding member failed', err);
+        console.error('Error status:', err.status);
+        console.error('Error message:', err.message);
+        console.error('Error details:', err.error);
+        
         this.addMemberForm.enable();
         this.isAddingMember.set(false);
         
-        this.snackBar.open('❌ שגיאה בהוספת חבר צוות', 'סגור', {
-          duration: 3000,
+        this.snackBar.open(`❌ שגיאה בהוספת חבר צוות: ${err.error?.message || err.message || 'Unknown'}`, 'סגור', {
+          duration: 5000,
           panelClass: ['error-snackbar']
         });
       }
@@ -210,6 +239,12 @@ export class Teams implements  OnInit {
         }
       });
     }
+  }
+
+  // פונקציה שמחזירה את מספר החברים בלי היוצר
+  getMemberCount(team: TeamDetails): number {
+    // השרת סופר את היוצר, אז נוריד 1
+    return Math.max(0, (team.members_count || 0) );
   }
 }
 

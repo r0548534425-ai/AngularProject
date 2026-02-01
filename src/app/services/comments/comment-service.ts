@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { addComment, CommentDetails, CommentsResponse } from '../../models/comments.model';
 import { TaskDetails } from '../../models/tasks.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { TaskDetails } from '../../models/tasks.model';
 export class CommentService {
   
 private http = inject(HttpClient); 
-    private apiUrl = 'https://angulaerserver.onrender.com/api/comments/';
+    private apiUrl = `${environment.apiUrl}/api/comments`;
 
 
   addComment(comment:addComment) {
@@ -23,11 +24,4 @@ private http = inject(HttpClient);
         headers:{ Authorization: `Bearer ${sessionStorage.getItem('token')}` }
     });
   }
-
-  deleteComment(commentId: number) {
-    return this.http.delete(`${this.apiUrl}${commentId}`, {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
-    });
-  }
-  
 }

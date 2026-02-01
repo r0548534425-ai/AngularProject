@@ -1,59 +1,239 @@
-# MyProject
+# Team Tasks App - Angular Client
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
+> מערכת ניהול משימות, פרויקטים וצוותים מבוססת Angular 19 עם Material Design
 
-## Development server
+![Angular](https://img.shields.io/badge/Angular-19-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Material](https://img.shields.io/badge/Material-Design-purple)
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
+## 📋 תיאור הפרויקט
+
+**Team Tasks App** היא אפליקציית web מתקדמת לניהול משימות קבוצתיות. המערכת מאפשרת לצוותים לנהל פרויקטים, משימות, ותגובות בממשק אינטואיטיבי ומקצועי.
+
+### ✨ תכונות עיקריות
+
+- 🔐 **אימות מאובטח** - JWT-based authentication
+- 👥 **ניהול צוותים** - יצירה, עריכה, והוספת חברים
+- 📁 **ניהול פרויקטים** - ארגון משימות לפי פרויקטים וצוותים
+- ✅ **ניהול משימות** - יצירה, עדכון, מחיקה עם עדיפויות וסטטוסים
+- 💬 **מערכת תגובות** - דיונים על משימות
+- 📊 **Dashboard** - סטטיסטיקות ומידע מרוכז
+- 📱 **Responsive Design** - עובד מצוין על כל המכשירים
+- 🎨 **Material Design** - ממשק משתמש מודרני ומקצועי
+
+---
+
+## 🚀 התחלה מהירה
+
+### דרישות מקדימות
+
+וודא שמותקנים אצלך:
+- **Node.js** (גרסה 18 ומעלה) - [הורד כאן](https://nodejs.org/)
+- **npm** (מגיע עם Node.js)
+- **Angular CLI** (גרסה 19):
+  ```bash
+  npm install -g @angular/cli@19
+  ```
+
+### 📥 התקנה
+
+1. **שכפל את הריפוזיטורי:**
+   ```bash
+   git clone https://github.com/r0548534425-ai/AngularProject.git
+   cd AngularProject
+   ```
+
+2. **התקן תלויות:**
+   ```bash
+   npm install
+   ```
+
+3. **הגדר משתני סביבה:**
+   
+   הפרויקט משתמש בקבצי environment לניהול כתובות API:
+   
+   - **פיתוח:** `src/environments/environment.ts`
+   ```typescript
+   export const environment = {
+     production: false,
+     apiUrl: 'http://localhost:3000'
+   };
+   ```
+   
+   - **פרודקשן:** `src/environments/environment.prod.ts`
+   ```typescript
+   export const environment = {
+     production: true,
+     apiUrl: 'https://angulaerserver.onrender.com'
+   };
+   ```
+
+4. **הפעל את השרת המקומי:**
+   ```bash
+   ng serve
+   ```
+
+5. **פתח בדפדפן:**
+   
+   נווט ל: [http://localhost:4200](http://localhost:4200)
+
+---
+
+## 🏗️ מבנה הפרויקט
+
+```
+src/
+├── app/
+│   ├── componnents/         # רכיבי UI
+│   │   ├── dashboard/       # דף הבית עם סטטיסטיקות
+│   │   ├── header/          # Header עם ניווט
+│   │   ├── footer/          # Footer
+│   │   ├── login/           # מסך כניסה
+│   │   ├── register/        # מסך הרשמה
+│   │   ├── teams/           # ניהול צוותים
+│   │   ├── projects/        # ניהול פרויקטים
+│   │   ├── tasks/           # ניהול משימות
+│   │   └── tasks-comment/   # תגובות למשימות
+│   ├── services/            # שירותי API
+│   │   ├── auth/            # שירות אימות
+│   │   ├── teams/           # שירות צוותים
+│   │   ├── projects/        # שירות פרויקטים
+│   │   ├── tasks/           # שירות משימות
+│   │   └── comments/        # שירות תגובות
+│   ├── guards/              # Route guards
+│   │   └── auth-guard.ts    # הגנה על routes מוגנים
+│   ├── models/              # טיפוסי TypeScript
+│   └── app.routes.ts        # הגדרות ניתוב
+└── environments/            # הגדרות סביבה
+    ├── environment.ts       # פיתוח
+    └── environment.prod.ts  # פרודקשן
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🔧 טכנולוגיות
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Frontend Stack
+
+| טכנולוגיה | תיאור | גרסה |
+|-----------|-------|------|
+| **Angular** | פריימוורק | 19.x |
+| **TypeScript** | שפת תכנות | 5.x |
+| **Angular Material** | ספריית UI | 19.x |
+| **RxJS** | תכנות reactive | 7.x |
+| **Signals** | ניהול state | Angular 19 |
+
+### תכונות מיוחדות
+
+- ✅ **Standalone Components** - ארכיטקטורה מודרנית
+- ✅ **Signals** - ניהול state reactivi של Angular 19
+- ✅ **Control Flow Syntax** - `@if`, `@for`, `@switch`
+- ✅ **Typed Forms** - טפסים עם type safety
+- ✅ **HttpClient** - קריאות API מאובטחות
+- ✅ **Router Guards** - הגנה עם `CanActivateFn`
+
+---
+
+## 📖 שימוש בסיסי
+
+### זרימת עבודה
+
+#### 1️⃣ הרשמה וכניסה
+1. נווט ל-`/register`
+2. מלא פרטים: שם, אימייל, סיסמה
+3. לחץ "הירשם"
+4. תועבר אוטומטית ל-Dashboard
+
+#### 2️⃣ יצירת צוות
+1. נווט ל-`/teams`
+2. לחץ "צוות חדש"
+3. מלא שם ותיאור
+4. הוסף חברי צוות
+
+#### 3️⃣ יצירת פרויקט
+1. נווט ל-`/projects`
+2. לחץ "פרויקט חדש"
+3. בחר צוות
+4. הוסף פרטי פרויקט
+
+#### 4️⃣ ניהול משימות
+1. כנס לפרויקט
+2. לחץ "משימה חדשה"
+3. הגדר: כותרת, תיאור, עדיפות, סטטוס
+4. הקצה למשתמש
+
+---
+
+## 🏭 בניה לפרודקשן
 
 ```bash
-ng generate component component-name
+# Build לפרודקשן
+ng build --configuration production
+
+# הקבצים יהיו ב:
+dist/my-project/browser/
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Deploy ל-Render/Netlify
 
+**Build Command:**
 ```bash
-ng generate --help
+ng build --configuration production
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
+**Publish Directory:**
+```
+dist/my-project/browser
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🔐 אבטחה
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+- JWT tokens ב-sessionStorage
+- Authorization headers בכל בקשה
+- Route guards למניעת גישה לא מורשית
+- Typed forms עם validation
+
+---
+
+## 🧪 טסטים
 
 ```bash
+# Unit tests
 ng test
-```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
+# E2E tests  
 ng e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## 📱 תאימות דפדפנים
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+✅ Chrome 90+  
+✅ Firefox 88+  
+✅ Safari 14+  
+✅ Edge 90+
+
+---
+
+## 👨‍💻 מפתח
+
+**GitHub:** [@r0548534425-ai](https://github.com/r0548534425-ai)
+
+---
+
+## 📝 רישיון
+
+MIT License
+
+---
+
+<div align="center">
+  <p>נבנה עם ❤️ באמצעות Angular 19</p>
+  <p>© 2026 Team Tasks App</p>
+</div>
+

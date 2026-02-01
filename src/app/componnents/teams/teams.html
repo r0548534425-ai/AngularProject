@@ -63,9 +63,9 @@
             <mat-icon mat-card-avatar>group</mat-icon>
             <mat-card-title>{{ team.name }}</mat-card-title>
             <mat-card-subtitle>
-              <mat-chip [matBadge]="team.members_count" matBadgeOverlap="false">
+              <mat-chip [matBadge]="getMemberCount(team)" matBadgeOverlap="false">
                 <mat-icon>person</mat-icon>
-                {{ team.members_count }} חברים
+                {{ getMemberCount(team) }} חברים
               </mat-chip>
             </mat-card-subtitle>
           </mat-card-header>
@@ -81,8 +81,8 @@
             <!-- Add Member Section -->
             <mat-expansion-panel 
               [expanded]="addMemberPanelState() === team.id" 
-              (opened)="addMemberPanelState.set(team.id)"
-              (closed)="addMemberPanelState.set(null)"
+              (opened)="openAddMemberPanel(team.id)"
+              (closed)="closeAddMemberPanel()"
               class="member-panel">
               <mat-expansion-panel-header>
                 <mat-panel-title>
@@ -125,11 +125,11 @@
           </mat-card-content>
 
           <mat-card-actions>
-            <a mat-button [routerLink]="['/projects', team.id]" color="primary">
+            <a mat-button [routerLink]="['/projects', team.id]" color="primary" aria-label="הצג פרויקטים">
               <mat-icon>folder</mat-icon>
               פרויקטים
             </a>
-            <button mat-button (click)="deleteTeam(team.id)" color="warn">
+            <button mat-button (click)="deleteTeam(team.id)" color="warn" aria-label="מחק צוות">
               <mat-icon>delete</mat-icon>
               מחק
             </button>

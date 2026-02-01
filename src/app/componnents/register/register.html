@@ -38,7 +38,7 @@
           <mat-label>סיסמה</mat-label>
           <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" placeholder="הזן סיסמה">
           <mat-icon matPrefix>lock</mat-icon>
-          <button mat-icon-button matSuffix (click)="hidePassword.set(!hidePassword())" type="button">
+          <button mat-icon-button matSuffix (click)="hidePassword.set(!hidePassword())" type="button" aria-label="הצג/הסתר סיסמה">
             <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
           @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
