@@ -21,6 +21,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { TemplateRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-tasks',
@@ -40,7 +42,8 @@ import { MatBadgeModule } from '@angular/material/badge';
     MatDatepickerModule,
     MatNativeDateModule,
     MatTooltipModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatDialogModule
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.css',
@@ -52,6 +55,10 @@ private projectService = inject(ProjectService);
 private authService = inject(AuthService);
 private router = inject(ActivatedRoute);
 private snackBar = inject(MatSnackBar);
+readonly dialog = inject(MatDialog);
+
+@ViewChild('deleteDialogTemplate') deleteDialogTemplate!: TemplateRef<any>;
+@ViewChild('editDialogTemplate') editDialogTemplate!: TemplateRef<any>;
 
 filteredTasks = signal<TaskDetails[]>([]);
 projects = signal<ProjectDetails[]>([]);
@@ -69,6 +76,8 @@ panelOpenState = signal(false);
 
 editingTaskId: number|null = null;
 deleteTaskId: number|null = null;
+taskToDelete = signal<TaskDetails | null>(null);
+
 addTaskForm=this.fg.group({
   project_id:[''], // לא נדרש כי נכפה אותו בקוד
   title:['',[Validators.required,Validators.minLength(3)]],
@@ -142,24 +151,40 @@ getUserName(userId: number | null): string {
   return user ? user.name : '';
 }
 
-deleteTask(id: number)
-{
+deleteTask(task: TaskDetails) {
+  this.taskToDelete.set(task);
+  const dialogRef = this.dialog.open(this.deleteDialogTemplate);
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result === true) {
+      this.performDeleteTask();
+    } else {
+      this.taskToDelete.set(null);
+    }
+  });
+}
+
+performDeleteTask() {
+  const task = this.taskToDelete();
+  if (!task) return;
+
   this.isDeleting.set(true);
-  this.taskService.deleteTask(id).subscribe({
+  this.taskService.deleteTask(task.id).subscribe({
     next: () => {
       this.loadTasks();
       this.deleteTaskId = null;
+      this.taskToDelete.set(null);
       this.isDeleting.set(false);
+      this.snackBar.open('המשימה נמחקה בהצלחה', 'סגור', { duration: 3000 });
     },
     error: (err) => {
       console.error('Error deleting task:', err);
       this.isDeleting.set(false);
+      this.snackBar.open('שגיאה במחיקת המשימה', 'סגור', { duration: 3000 });
     }
-  
-    
-  })
-
+  });
 }
+
 addTask(){
   if (this.isAdding()) return;
   
@@ -253,37 +278,49 @@ saveEdit() {
     return;
   }
 
-  this.editTaskForm.disable();
-  this.isUpdating.set(true);
-  
-  const raw = this.editTaskForm.value as any;
-  const updatedTask: any = {
-    ...raw,
-    assignee_id: raw.assignee_id === '' || raw.assignee_id === null ? null : +raw.assignee_id,
-    due_date: raw.due_date === '' ? null : raw.due_date
-  };
+  const dialogRef = this.dialog.open(this.editDialogTemplate);
 
-  this.taskService.updateTask(this.editingTaskId, updatedTask).subscribe({
-    next: (response) => {
-      console.log('✅ Task updated successfully!', response);
-      this.loadTasks();
-      this.editingTaskId = null;
-      this.editTaskForm.reset();
-      this.editTaskForm.enable();
-      this.isUpdating.set(false);
-      
-    },
-    error: (err) => {
-      console.error('❌ Error updating task:', err);
-      console.error('❌ Error details:', err.error);
-      this.loadTasks();
-      this.editingTaskId = null;
-      this.editTaskForm.enable();
-      this.isUpdating.set(false);
+  dialogRef.afterClosed().subscribe(result => {
+    if (result === true) {
+      this.performSaveEdit();
     }
   });
 }
-ProjectTasks(projectId: number) {
+
+performSaveEdit() {
+      this.editTaskForm.disable();
+      this.isUpdating.set(true);
+      
+      const raw = this.editTaskForm.value as any;
+      const updatedTask: any = {
+        ...raw,
+        assignee_id: raw.assignee_id === '' || raw.assignee_id === null ? null : +raw.assignee_id,
+        due_date: raw.due_date === '' ? null : raw.due_date
+      };
+  
+      this.taskService.updateTask(this.editingTaskId!, updatedTask).subscribe({
+        next: (response) => {
+          console.log('✅ Task updated successfully!', response);
+          this.loadTasks();
+          this.editingTaskId = null;
+          this.editTaskForm.reset();
+          this.editTaskForm.enable();
+          this.isUpdating.set(false);
+          this.snackBar.open('המשימה עודכנה בהצלחה', 'סגור', { duration: 3000 });
+        },
+        error: (err) => {
+          console.error('❌ Error updating task:', err);
+          console.error('❌ Error details:', err.error);
+          this.loadTasks();
+          this.editingTaskId = null;
+          this.editTaskForm.enable();
+          this.isUpdating.set(false);
+          this.snackBar.open('שגיאה בעדכון המשימה', 'סגור', { duration: 3000 });
+        }
+      });
+  }
+
+  ProjectTasks(projectId: number) {
     this.isLoading.set(true);
     this.taskService.getTasksByProject(projectId).subscribe({
         next: (tasks) => {

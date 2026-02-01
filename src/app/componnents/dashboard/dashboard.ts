@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,7 +28,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatProgressSpinnerModule,
     MatGridListModule,
     MatListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatSnackBarModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -37,6 +39,7 @@ export class Dashboard implements OnInit {
   private taskService = inject(TaskServer);
   private projectService = inject(ProjectService);
   private teamService = inject(TeamService);
+  private snackBar = inject(MatSnackBar);
 
   tasks = signal<TaskDetails[]>([]);
   projects = signal<ProjectDetails[]>([]);

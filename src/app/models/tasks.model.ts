@@ -18,6 +18,7 @@ export interface TaskDetails
         order_index: number;
         created_at: string;
         updated_at: string;
+        comments_count?: number;
     }
 export interface updateTask {
 
